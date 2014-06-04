@@ -1,0 +1,22 @@
+#!/bin/bash  
+for Nt in 1e15 1e16       # This for cycle must have the same structure of the cycle used to generate files. The first variable is tipically the indipendent one. In a multivariable plot, this one should be the variable kept constant for each graph
+do  
+cd ./${Nt}_mob66_m15/.    # Enters the proper folder
+# Next 3 lines create an header line for the plotting in order to be human readable, the first char must be an "#" in order to be skipped by gnuplot
+echo "#Et, Current, DefectsDensity" > current.dat
+echo "#Et, CarrierDensity_e, DefectsDensity" > e_density.dat
+echo "#Et, CarrierDensity_h, DefectsDensity" > h_density.dat
+
+        for Et in 0.0 0.05 # Scan on the second variable
+        do
+#AKW "-v"  passes a bash variable to a awk comand, in this case we pass both variables to awk *Et and Nt). It is possible to change the variable name in the awk comand. so something like VAR2="$VAR1" is legit.
+#AWK NR==n select the line number n. 
+awk -v Nt="$Nt" -v Et="$Et" 'NR==14 {print Et, $3, Nt}' output_${Et}_${Nt}/volt_driftdiffusion.dat >> current.dat #"NR==14" prints only the last line of the file.
+awk -v Nt="$Nt" -v Et="$Et" 'NR==3  {print Et, $7, Nt}' output_${Et}_${Nt}/driftdiffusion_msh.dat >> h_density.dat #NR printa la n-sima riga  
+awk -v Nt="$Nt" -v Et="$Et" 'NR==3  {print Et, $6, Nt}' output_${Et}_${Nt}/driftdiffusion_msh.dat >> e_density.dat #NR printa la n-sima riga
+
+
+
+done
+cd ..
+done
